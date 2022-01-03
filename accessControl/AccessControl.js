@@ -7,7 +7,7 @@ class AccessControl {
     }
 
     validate(username, password) {
-        return this.permissionsMap[username] === password;
+        return this.credentialsMap[username] === password;
     }
 
     addUser(username, password) {
@@ -15,14 +15,19 @@ class AccessControl {
         this.permissionsMap.users.list.push(username);
 
         return {
-            username: password
+            username: password,
+            isAdmin: false
         }
     }
 
     addAdmin() {
         this.credentialsMap[username] = password;
 
-
+        this.permissionsMap.admins.list.push(username);
+        return {
+            username: password,
+            isAdmin : true
+        }
     }
 }
 

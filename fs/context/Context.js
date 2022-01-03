@@ -16,6 +16,7 @@ class Context {
       expireTime: 259200000 // 3 days
     }
     this.maxUsers = 5;
+    this.currentUser = null;
   }
 
   save(permissions, credentials) {
@@ -43,7 +44,7 @@ class Context {
   }
 
   isMaxUsers() {
-    return this.accessControl.credentialsMap.length === this.maxUsers;
+    return Object.keys(this.accessControl.credentialsMap).length === this.maxUsers;
   }
 
   createUser(username, password) {
