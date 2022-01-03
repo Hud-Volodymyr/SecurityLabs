@@ -1,8 +1,8 @@
 'use strict';
 
 const register = (context, username, password) => {
-    if (password.length !== context.password.length) {
-        console.log(`Password has to be of length ${context.password.length}!`);
+    if (context.validatePassword(password)) {
+        console.log(`Invalid password!`);
         return;
     };
 
@@ -12,4 +12,12 @@ const register = (context, username, password) => {
     }
 
     const savedUser = context.createUser(username, password)
+
+    if (!savedUser) {
+        console.log('Failed to create new user!');
+        return;
+    }
+    console.log('Success!');
 }
+
+module.exports = register;

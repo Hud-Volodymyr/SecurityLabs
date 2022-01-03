@@ -12,7 +12,11 @@ class AccessControl {
 
     addUser(username, password) {
         this.credentialsMap[username] = password;
+        this.permissionsMap.users.list.push(username);
 
+        return {
+            username: password
+        }
     }
 
     addAdmin() {

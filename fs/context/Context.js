@@ -25,20 +25,34 @@ class Context {
 
   _getPermissions(permissionsPath) {
     if (fs.existsSync(permissionsPath)) return JSON.parse(fs.readFileSync(path.join(this.BASE_PATH, permissionsPath)));
-    return '{}';
+    return {
+      users: {
+        access: [ 'A', 'E' ],
+        list: []
+      },
+      admins: {
+        access: [ 'A', 'B', 'C', 'D', 'E'],
+        list: []
+      }
+    };
   }
 
   _getCredentials(credentialsPath) {
     if(fs.existsSync(credentialsPath)) return JSON.parse(fs.readFileSync(path.join(this.BASE_PATH, credentialsPath)));
-    return '{}';
+    return {};
   }
 
   isMaxUsers() {
     return this.accessControl.credentialsMap.length === this.maxUsers;
   }
 
-  saveUser(username, password) {
-    this.accessControl.addUser(username, password);
+  createUser(username, password) {
+    const user = this.accessControl.addUser(username, password);
+    return user;
+  }
+
+  validatePassword(password) {
+    return password.length !== this.password.length;
   }
 }
 
