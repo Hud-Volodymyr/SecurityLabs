@@ -1,9 +1,16 @@
 'use strict';
 
 const login = (context, username, password) => {
+    if (context.currentUser) {
+        console.log('Already logged in');
+        return;
+    }
     const accessControl = context.accessControl;
     const isValidUser = accessControl.validate(username, password)
-    if (!isValidUser) throw new Error('User does not exist');
+    if (!isValidUser) {
+        console.log('User does not exist');
+        return;
+    }
     context.currentUser = username;
 
     console.log('Success!');
