@@ -3,13 +3,14 @@
 const AccessControl = require("../../accessControl/AccessControl");
 const fs = require('fs');
 const path = require('path');
-const permissionsPath = '.permissions.json';
-const credentialsPath = '.credentials.json';
 
 class Context {
-  constructor() {
-    const permissions = this._getPermissions(permissionsPath);
-    const credentials = this._getCredentials(credentialsPath);
+  constructor(physicalBasePath, permissionsPath, credentialsPath) {
+    this.basePath = physicalBasePath;
+    this.permissionsPath = permissionsPath;
+    this.credentialsPath = credentialsPath;
+    const permissions = this._getPermissions();
+    const credentials = this._getCredentials();
     this.accessControl = new AccessControl(permissions, credentials);
     this.password = {
       length: 3,
@@ -17,29 +18,33 @@ class Context {
     }
     this.maxUsers = 5;
     this.currentUser = null;
+    this.isAdmin = false;
+    this.workingDir = '/';
   }
 
-  save(permissions, credentials) {
-    fs.writeFileSync(permissions, this.accessControl.permissionsMap.toJson());
-    fs.writeFileSync(credentials, this.accessControl.credentialsMap.toJson());
+  save() {
+    fs.writeFileSync(path.join(this.basePath, this.permissionsPath), JSON.stringify(this.accessControl.permissionsMap));
+    fs.writeFileSync(path.join(this.basePath, this.credentialsPath), JSON.stringify(this.accessControl.credentialsMap));
   }
 
-  _getPermissions(permissionsPath) {
-    if (fs.existsSync(permissionsPath)) return JSON.parse(fs.readFileSync(path.join(this.BASE_PATH, permissionsPath)));
+  _getPermissions() {
+    const permPath = path.join(this.basePath, this.permissionsPath);
+    if (fs.existsSync(permPath)) return JSON.parse(fs.readFileSync(permPath));
     return {
       users: {
         access: [ 'A', 'E' ],
-        list: []
+        list: {}
       },
       admins: {
         access: [ 'A', 'B', 'C', 'D', 'E'],
-        list: []
+        list: {}
       }
     };
   }
 
-  _getCredentials(credentialsPath) {
-    if(fs.existsSync(credentialsPath)) return JSON.parse(fs.readFileSync(path.join(this.BASE_PATH, credentialsPath)));
+  _getCredentials() {
+    const credPath = path.join(this.basePath, this.credentialsPath)
+    if(fs.existsSync(credPath)) return JSON.parse(fs.readFileSync(credPath));
     return {};
   }
 
@@ -52,8 +57,18 @@ class Context {
     return user;
   }
 
+  createAdmin(username, password) {
+    const admin = this.accessControl.addAdmin(username, password);
+    return admin;
+  }
+
   validatePassword(password) {
     return password.length !== this.password.length;
+  }
+
+  deleteUser(username) {
+    const status = this.accessControl.deleteUser(username);
+    return status;
   }
 }
 

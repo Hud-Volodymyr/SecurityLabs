@@ -3,7 +3,9 @@ const path = require('path');
 const fs = require('fs');
 const Context = require('./context/Context');
 
-const userDirs = ['A', 'B', 'C', 'D'];
+const userDirs = ['A', 'B', 'C', 'D', 'E'];
+const permissionsPath = '.permissions.json';
+const credentialsPath = '.credentials.json';
 
 class FileSystem {
   constructor(physicalBasePath = '../TESTDIR') {
@@ -12,13 +14,13 @@ class FileSystem {
     
     this._createRootDir();
     this._createUserDirs();
-    this.context = new Context();
+    this.context = new Context(this.BASE_PATH, permissionsPath, credentialsPath);
   }
 
   exit() {
     console.log(`\n${this.constructor.name} is exiting...`);
-    return;
     this._saveContext();
+    return
   }
 
   _saveContext() {
@@ -37,6 +39,7 @@ class FileSystem {
       const dir = fs.readdirSync(this.BASE_PATH);
       if (dir.length !== 0) {
         dir.forEach(file => {
+          if (file === permissionsPath || file === credentialsPath) return;
           if (!userDirs.includes(file)) throw new Error(`Directory ${this.BASE_PATH} is not empty`);
         })
       }

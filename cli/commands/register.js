@@ -1,6 +1,6 @@
 'use strict';
 
-const register = (context, username, password) => {
+const register = (context, username, password, isAdmin = 0) => {
     if (context.validatePassword(password)) {
         console.log(`Invalid password!`);
         return;
@@ -11,7 +11,12 @@ const register = (context, username, password) => {
         return;
     }
 
-    const savedUser = context.createUser(username, password)
+    let savedUser = null;
+    if (isAdmin) {
+        savedUser = context.createAdmin(username, password)
+    } else {
+        savedUser = context.createUser(username, password)
+    }
 
     if (!savedUser) {
         console.log('Failed to create new user!');

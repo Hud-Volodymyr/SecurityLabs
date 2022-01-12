@@ -12,6 +12,7 @@ const login = (context, username, password) => {
         return;
     }
     context.currentUser = username;
+    context.isAdmin     = accessControl.isAdmin(username)
 
     console.log('Success!');
 };

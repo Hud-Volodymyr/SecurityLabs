@@ -3,7 +3,7 @@
 const logout = (context) => {
     context.currentUser = null;
 
-    console.log('Success!');
+    console.log('Logged out!');
 };
 
 module.exports = logout;
