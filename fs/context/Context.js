@@ -3,15 +3,18 @@
 const AccessControl = require("../../accessControl/AccessControl");
 const fs = require('fs');
 const path = require('path');
+const History = require('./History');
 
 class Context {
-  constructor(physicalBasePath, permissionsPath, credentialsPath) {
+  constructor(physicalBasePath, permissionsPath, credentialsPath, historyPath) {
     this.basePath = physicalBasePath;
     this.permissionsPath = permissionsPath;
     this.credentialsPath = credentialsPath;
+    this.historyPath = historyPath;
     const permissions = this._getPermissions();
     const credentials = this._getCredentials();
     this.accessControl = new AccessControl(permissions, credentials);
+    this.history = new History(historyPath);
     this.password = {
       length: 3,
       expireTime: 259200000 // 3 days
@@ -25,6 +28,11 @@ class Context {
   save() {
     fs.writeFileSync(path.join(this.basePath, this.permissionsPath), JSON.stringify(this.accessControl.permissionsMap));
     fs.writeFileSync(path.join(this.basePath, this.credentialsPath), JSON.stringify(this.accessControl.credentialsMap));
+    this._saveHistory();
+  }
+
+  _saveHistory() {
+    this.history.save(this.basePath);
   }
 
   _getPermissions() {

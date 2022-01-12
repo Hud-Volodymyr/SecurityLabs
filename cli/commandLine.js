@@ -50,10 +50,12 @@ class Command {
   async ask(context, qLine, questionKeys, index, tries) {
     const answer = await question(qLine + '\n>');
     if (answer && answer === questionKeys[index]) {
+      context.history.add(`System question: ${qLine}, answer: ${answer}, tries: ${tries + 1}, warning level: 0 ${new Date()} \n`);
       console.log('Success!');
       return;
     } else {
       if (tries) {
+        context.history.add(`System question: ${qLine}, answer: ${answer}, tries: ${tries}, warning level: 1 ${new Date()} \n`);
         tries -= 1
         console.log('Try again!')
         await this.ask(context, qLine, questionKeys, index, tries)
@@ -65,6 +67,7 @@ class Command {
           }
         }
         commands.logout(context);
+        context.history.add(`System question: ${qLine}, answer: ${answer}, tries: ${tries}, warning level: 2 ${new Date()} \n`);
         return;
       }
     }
@@ -77,6 +80,7 @@ module.exports = {
     const command = new Command(); 
     
     rl.on('line', (line) => {
+      fs.context.history.add(line + '  warning level: 0   ' + new Date() + '\n');
       let args;
       line = line.trim();
       line = line.split(' ');

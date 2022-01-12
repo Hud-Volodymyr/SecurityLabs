@@ -16,7 +16,7 @@ const ls = (context, dir = '') => {
 
     const files = listing.filter((file) => {
         if (context.isAdmin) return true;
-        if (file === context.permissionsPath || file === context.credentialsPath) return;
+        if (file === context.permissionsPath || file === context.credentialsPath || file === context.history.historyPath) return;
         return context.accessControl.checkUserAccess(context.currentUser, file, relativePath, 'R');
     })
     
