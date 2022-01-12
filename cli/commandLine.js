@@ -36,7 +36,7 @@ class Command {
       commands[command](context, ...args);
     } else {
       if (this.time && this.time < Date.now() - 1000 * 120) { // every 2 minutes
-        const tries = 2;
+        const tries = 1;
         const questionKeys = Object.keys(questions)
         const index = Math.floor(Math.random()*questionKeys.length);
         const question = questions[questionKeys[index]]
@@ -53,7 +53,7 @@ class Command {
       console.log('Success!');
       return;
     } else {
-      if (!tries) {
+      if (tries) {
         tries -= 1
         console.log('Try again!')
         await this.ask(context, qLine, questionKeys, index, tries)
