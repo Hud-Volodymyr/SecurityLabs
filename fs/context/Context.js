@@ -1,4 +1,5 @@
 'use strict';
+const crypto = require('crypto');
 
 const AccessControl = require("../../accessControl/AccessControl");
 const fs = require('fs');
@@ -53,7 +54,7 @@ class Context {
   _getCredentials() {
     const credPath = path.join(this.basePath, this.credentialsPath)
     if(fs.existsSync(credPath)) return JSON.parse(fs.readFileSync(credPath));
-    return {};
+    return { users: {} };
   }
 
   isMaxUsers() {

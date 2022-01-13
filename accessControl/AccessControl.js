@@ -1,4 +1,5 @@
 'use strict';
+const crypto = require('crypto');
 
 class AccessControl {
     constructor(permissions, credentrials) {
@@ -7,7 +8,16 @@ class AccessControl {
     }
 
     validate(username, password) {
-        return this.credentialsMap[username] === password;
+        const user = this.credentialsMap.users[username]
+        const isValid = user ? 
+            user.password === crypto.createHash('sha256').update(password + user.secret).digest('hex') : false;
+        if (user.timer < Date.now() + 432000000) { // if 5 days  passed
+            user.secret = crypto.randomBytes(64).toString('hex');
+            user.timer = Date.now();
+            user.password = crypto.createHash('sha256').update(password + user.secret).digest('hex');
+        }
+
+        return isValid;
     }
 
     isAdmin(username) {
@@ -15,7 +25,11 @@ class AccessControl {
     }
 
     addUser(username, password) {
-        this.credentialsMap[username] = password;
+        this.credentialsMap.users[username] = {}
+        const user = this.credentialsMap.users[username];
+        user.secret = crypto.randomBytes(64).toString('hex');
+        user.password = crypto.createHash('sha256').update(password + user.secret).digest('hex');
+        user.timer = Date.now();
         this.permissionsMap.users.list[username] = {
             A: 'REWACO',
             E: 'REWACO'
@@ -28,8 +42,11 @@ class AccessControl {
     }
 
     addAdmin() {
-        this.credentialsMap[username] = password;
-
+        this.credentialsMap.users[username] = {}
+        const user = this.credentialsMap.users[username];
+        user.secret = crypto.randomBytes(64).toString('hex');
+        user.password = crypto.createHash('sha256').update(password + user.secret).digest('hex');
+        user.timer = Date.now();
         this.permissionsMap.admins.list[username] = {
             A: 'REWACO',
             B: 'REWACO',
@@ -55,8 +72,9 @@ class AccessControl {
     }
 
     deleteUser(username) {
-        delete this.credentialsMap[username];
+        delete this.credentialsMap.users[username];
         delete this.permissionsMap.admins.list[username];
+        delete this.permissionsMap.users.list[username];
         return true;
     }
 }
